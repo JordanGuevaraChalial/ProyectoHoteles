@@ -6,15 +6,14 @@ from folium import Element
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 
-# ============================
+
 # 1) CARGA Y FILTRADO ESTRICTO
-# ============================
-print("📖 Cargando y filtrando datos...")
+print("Cargando y filtrando datos...")
 try:
     df1 = pd.read_excel('./assets/1era-quincena-febrero-catastro-nacional-2025-banecuador.xlsx')
     df2 = pd.read_excel('./assets/mdi_personasdesaparecidas_pm_2025_enero_octubre.xlsx')
 except FileNotFoundError as e:
-    print(f"❌ Error: No se encontró el archivo {e.filename}")
+    print(f"Error: No se encontró el archivo {e.filename}")
     exit()
 
 # --- FILTRO DE CLASIFICACIÓN ---
@@ -23,7 +22,7 @@ df1['Clasificación'] = df1['Clasificación'].astype(str).str.upper().str.strip(
 tipos_permitidos = ['HOTEL', 'HOSTAL', 'HOSTERÍA']
 df1 = df1[df1['Clasificación'].isin(tipos_permitidos)]
 
-print(f"✅ Filtro aplicado: Solo se procesarán {len(df1)} registros de tipo Hotel, Hostal u Hostería.")
+print(f"Filtro aplicado: Solo se procesarán {len(df1)} registros de tipo Hotel, Hostal u Hostería.")
 
 # Estandarizar nombres para la unión
 df1 = df1.rename(columns={'Provincia':'PROVINCIA','Cantón':'CANTON','Parroquia':'PARROQUIA'})
@@ -41,10 +40,9 @@ df2['Longitud'] = df2['Longitud'].apply(limpiar_coord)
 df = pd.merge(df1.dropna(subset=['PROVINCIA','CANTON','PARROQUIA']), 
               df2, on=['PROVINCIA','CANTON','PARROQUIA'], how='inner')
 
-# ============================
-# 2) MACHINE LEARNING (100%)
-# ============================
-print("🧠 Entrenando modelo con zonas de riesgo...")
+# 2) MACHINE LEARNING 
+
+print("Entrenando modelo con zonas de riesgo...")
 df['RIESGO_NUM'] = df.groupby(['PROVINCIA','CANTON','PARROQUIA'])['PARROQUIA'].transform('count')
 df['NIVEL_REAL'] = df['RIESGO_NUM'].apply(lambda x: 'ALTO' if x >= 10 else ('MEDIO' if x >= 5 else 'BAJO'))
 
@@ -58,9 +56,9 @@ y = df['NIVEL_REAL']
 modelo = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)
 df['NIVEL_PREDICHO'] = modelo.predict(X)
 
-# ============================
+
 # 3) AJUSTE DE ESTRELLAS (REFINADO)
-# ============================
+
 def extraer_y_ajustar(valor_cat, nivel):
     # Buscamos solo los números (ej: "3" de "3 Estrellas" o "3 ESTRELLAS")
     numeros = re.findall(r'\d+', str(valor_cat))
@@ -75,9 +73,9 @@ def extraer_y_ajustar(valor_cat, nivel):
 
 df['ESTRELLAS_AJUSTADAS'] = df.apply(lambda x: extraer_y_ajustar(x['Categoría'], x['NIVEL_PREDICHO']), axis=1)
 
-# ============================
-# 4) MAPA FINAL
-# ============================
+
+# 4) CREACIÓN DEL MAPA FINAL
+
 print("🗺️  Generando mapa...")
 m = folium.Map(location=[df['Latitud'].iloc[0], df['Longitud'].iloc[0]], zoom_start=7)
 
