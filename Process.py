@@ -2,9 +2,13 @@ import pandas as pd
 import numpy as np
 import re
 import folium
+import matplotlib.pyplot as plt
 from folium import Element
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder
+
 
 
 # 1) CARGA Y FILTRADO ESTRICTO
@@ -73,6 +77,14 @@ def extraer_y_ajustar(valor_cat, nivel):
 
 df['ESTRELLAS_AJUSTADAS'] = df.apply(lambda x: extraer_y_ajustar(x['Categoría'], x['NIVEL_PREDICHO']), axis=1)
 
+# Suponiendo que tienes y_test y y_pred (usa train_test_split para validación real)
+# Si no tienes split, puedes usar y vs y_pred en todo el dataset (pero idealmente valida)
+cm = confusion_matrix(y, df['NIVEL_PREDICHO'], labels=['BAJO', 'MEDIO', 'ALTO'])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['BAJO', 'MEDIO', 'ALTO'])
+disp.plot(cmap='Blues')
+plt.title('Matriz de Confusión - Random Forest')
+plt.savefig('confusion_matrix_rf.png', dpi=300, bbox_inches='tight')
+plt.show()
 
 # 4) CREACIÓN DEL MAPA FINAL
 
