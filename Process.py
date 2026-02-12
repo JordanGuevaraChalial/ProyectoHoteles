@@ -86,6 +86,26 @@ plt.title('Matriz de Confusión - Random Forest')
 plt.savefig('confusion_matrix_rf.png', dpi=300, bbox_inches='tight')
 plt.show()
 
+# Para visualibilidad sobre las zonas
+plt.figure(figsize=(10, 6))
+plt.hist(df['RIESGO_NUM'], bins=30, color='skyblue', edgecolor='black', log=False)  # o bins='auto'
+
+# Umbrales exactos de tu código
+plt.axvline(x=5, color='orange', linestyle='--', linewidth=2, label='Umbral Medio (≥5)')
+plt.axvline(x=10, color='red', linestyle='--', linewidth=2, label='Umbral Alto (≥10)')
+
+# Zona Bajo sombreada opcional
+plt.axvspan(0, 5, alpha=0.1, color='green', label='Riesgo Bajo (<5)')
+
+plt.title('Distribución del número de incidentes de desapariciones por parroquia (2025)')
+plt.xlabel('Número de personas desaparecidas por parroquia')
+plt.ylabel('Frecuencia de parroquias')
+plt.legend()
+plt.grid(axis='y', alpha=0.3)
+plt.tight_layout()
+
+plt.savefig('distribucion_incidentes_parroquia.png', dpi=300, bbox_inches='tight')
+plt.show()
 # 4) CREACIÓN DEL MAPA FINAL
 
 print("🗺️  Generando mapa...")
