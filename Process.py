@@ -86,7 +86,7 @@ plt.title('Matriz de Confusión - Random Forest')
 plt.savefig('confusion_matrix_rf.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-# Para visualibilidad sobre las zonas
+# Para visualibilidad sobre las
 plt.figure(figsize=(10, 6))
 plt.hist(df['RIESGO_NUM'], bins=30, color='skyblue', edgecolor='black', log=False)  # o bins='auto'
 
